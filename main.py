@@ -271,6 +271,9 @@ def main(path):
                 print(Colors.FAIL, log_item, Colors.ENDC)
             if typ == "warning":
                 print(Colors.WARNING, log_item, Colors.ENDC)
+            if typ == "info":
+                print(Colors.BOLD, log_item, Colors.ENDC)
+
         log_list = list()
 
     print("parsing took %f seconds" % (time.time() - start))

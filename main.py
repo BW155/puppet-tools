@@ -3,15 +3,12 @@ import re
 import time
 from re import Pattern
 
-from constants import SPLIT_TOKEN
+from constants import SPLIT_TOKEN, Colors
 from puppet_block import PuppetBlock
 from puppet_case import PuppetCase
 from puppet_case_item import PuppetCaseItem
 from puppet_class import PuppetClass, PuppetFile
 from puppet_resource import PuppetResource
-
-
-
 
 
 CHECK_RESOURCE_ITEM_POINTER = re.compile(r"\S+[ ]*=>")
@@ -262,14 +259,18 @@ def main(path):
     path = os.path.abspath(path)
 
     for f in puppet_files:
-        print("Processing file: .%s" % f.replace(path, ""))
+        print(Colors.OKCYAN, "Processing file: .%s" % f.replace(path, ""), Colors.ENDC)
         try:
             process_file(f)
         except Exception as e:
-            print("FATAL ERROR:")
-            print(e)
+            print(Colors.FAIL, "FATAL ERROR:", Colors.ENDC)
+            print(Colors.FAIL, e, Colors.ENDC)
         for log_item in log_list:
-            print(log_item)
+            typ = log_item[1]
+            if typ == "error":
+                print(Colors.FAIL, log_item, Colors.ENDC)
+            if typ == "warning":
+                print(Colors.WARNING, log_item, Colors.ENDC)
         log_list = list()
 
     print("parsing took %f seconds" % (time.time() - start))

@@ -1,6 +1,6 @@
 import os
 import re
-from re import Pattern
+from typing import Pattern
 
 from constants import log_messages
 

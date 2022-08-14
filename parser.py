@@ -46,6 +46,7 @@ def walk_block(content, line_number, puppet_file):
                         content[index:index + 2])
             index += 2
         elif content[index:index + 7] == "include":
+            # TODO: Validate through regex
             index += 8  # include space after 'include'
             name = ""
             while content[index] in list(string.ascii_letters) + list(string.digits) + [':', '_']:
@@ -54,6 +55,7 @@ def walk_block(content, line_number, puppet_file):
             include = PuppetInclude(name)
             puppet_block.add_item(include)
         elif content[index:index + 4] == "case":
+            # TODO: Validate through regex
             index += 5  # include space after 'case'
             name, size = get_until(content[index:], ' ')
 
@@ -68,6 +70,7 @@ def walk_block(content, line_number, puppet_file):
             index += ind - index
         elif content[index:index + 5] == "class":
             # Found class beginning
+            # TODO: Validate through regex
             index += 6  # include space after 'class'
 
             name, size = get_until(content[index:], ' ')
@@ -83,7 +86,7 @@ def walk_block(content, line_number, puppet_file):
             line_number += count_newlines(content[index:ind])
             index += ind - index
         else:
-            items = [len(i) for i in ["package", "file", "service", "cron", "exec"]
+            items = [len(i) for i in PuppetResource.TYPES
                      if content[index:].startswith(i) and "=>" not in get_until(content[index:], "\n")[0]]
             if len(items) == 1:
                 text, size = get_until(content[index:], "\n")
@@ -127,6 +130,7 @@ def walk_case(content, name, line_number, puppet_file):
     while index < len(content):
         char = content[index]
         if char == "'":
+            # TODO: Validate through regex
             index += 1
             name, size = get_until(content[index:], "'")
             index += size

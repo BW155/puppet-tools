@@ -1,4 +1,9 @@
-class PuppetResource:
+from puppet_objects import PuppetObject
+
+
+class PuppetResource(PuppetObject):
+    TYPES = ["package", "file", "service", "cron", "exec"]
+
     def __init__(self, typ):
         self.typ = typ
         self.is_dependency = False

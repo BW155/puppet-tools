@@ -1,7 +1,8 @@
 from constants import SPLIT_TOKEN
+from puppet_objects import PuppetObject
 
 
-class PuppetFile:
+class PuppetFile(PuppetObject):
     def __init__(self, path):
         self.name = path.split(SPLIT_TOKEN)[-1]
         self.path = path

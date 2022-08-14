@@ -1,4 +1,7 @@
-class PuppetCase:
+from puppet_objects import PuppetObject
+
+
+class PuppetCase(PuppetObject):
     def __init__(self, name):
         self.name = name
         self.items = []

@@ -2,7 +2,6 @@ import os
 
 from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL
 from puppet_objects import PuppetObject
-from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
 from puppet_objects.puppet_class import PuppetClass
 from puppet_objects.puppet_include import PuppetInclude

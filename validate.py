@@ -52,8 +52,8 @@ def process_puppet_module(puppet_files, module_name):
     # Summary
     print("")
     print("Module '%s' Content Summary:" % module_name)
-    print("Classes:\t", ", ".join(c.name for c in classes))
-    print("Case items:\t", ", ".join(c.name for c in case_items))
+    print("Classes:\t", ", ".join(list(set(c.name for c in classes))))
+    print("Case items:\t", ", ".join(list(set(c.name for c in case_items))))
     print("Packages:\t", ", ".join(list(set(p.name for p in packages))))
     print("Execs:\t\t", ", ".join(list(set(e.name for e in execs))))
     print("Services:\t", ", ".join(list(set(s.name for s in services))))
@@ -67,5 +67,5 @@ def process_puppet_module(puppet_files, module_name):
             if i.name == c.name:
                 break
         else:
-            add_log(module_name, LOG_TYPE_ERROR, (0, 0), "There was an include for %s but no class in the module" % i,
-                    "")
+            add_log(module_name, LOG_TYPE_ERROR, (0, 0),
+                    "There was an include for %s but no class in the module" % i, "")

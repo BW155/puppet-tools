@@ -1,5 +1,6 @@
 import os
 import time
+import argparse
 
 from termcolor import colored
 
@@ -58,6 +59,11 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
 
     print("parsing took %f seconds" % (time.time() - start))
 
+    if print_tree:
+        for i in total:
+            print(i)
+            i.print_items()
+
     if only_parse:
         return
 
@@ -68,12 +74,41 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
 
     print("validating took %f seconds" % (time.time() - start))
 
-    # if print_tree:
-    #    for i in total:
-    #        print(i)
-    #        i.print_items()
-
 
 if __name__ == '__main__':
-    check_path = "./ossec-development"
-    main(check_path, log_level=LOG_TYPE_ERROR, print_tree=False, only_parse=False)
+    my_parser = argparse.ArgumentParser(
+        description="Puppet Tools, including parser, linter and validator functions",
+        epilog='Enjoy the results! :)'
+    )
+
+    my_parser.add_argument("Path",
+                           metavar="path",
+                           type=str,
+                           help="the path to a puppet module")
+
+    my_parser.add_argument("-t",
+                           "--print-tree",
+                           action='store_true',
+                           help="Print the tree of parsed objects")
+
+    my_parser.add_argument("-op",
+                           "--only-parse",
+                           action='store_true',
+                           help="Only parse for format validating/linting")
+
+    my_parser.add_argument("-l",
+                           "--log-level",
+                           type=int,
+                           default=2,
+                           help="Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5)")
+
+    args = my_parser.parse_args()
+
+    print(args)
+    check_path = args.Path
+
+    if not os.path.isdir(check_path):
+        print("The path specified does not exist")
+        exit(1)
+
+    main(check_path, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)

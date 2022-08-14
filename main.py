@@ -116,11 +116,14 @@ if __name__ == '__main__':
 
     args = my_parser.parse_args()
 
-    print(args)
     check_path = args.Path
 
     if not os.path.isdir(check_path):
         print("The path specified does not exist")
+        exit(1)
+
+    if not os.path.exists(os.path.join(check_path, "files")) or not os.path.exists(os.path.join(check_path, "manifests")):
+        print("Not a valid puppet module structure at path")
         exit(1)
 
     main(check_path, args.ModuleName, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)

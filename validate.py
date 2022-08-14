@@ -1,6 +1,6 @@
 import os
 
-from constants import LOG_TYPE_ERROR, SPLIT_TOKEN
+from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL
 from puppet_objects import PuppetObject
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -10,7 +10,7 @@ from puppet_objects.puppet_resource import PuppetResource
 from utility import add_log
 
 
-def sort_puppet_objects(puppet_object, typ, results=None, index_list=None):
+def sort_puppet_objects(puppet_object, results=None, index_list=None):
     if index_list is None:
         index_list = []
     if results is None:
@@ -23,7 +23,7 @@ def sort_puppet_objects(puppet_object, typ, results=None, index_list=None):
                 if type(it) not in results:
                     results[type(it)] = []
                 results[type(it)].append((index_list, it))
-                results = sort_puppet_objects(it, typ, results, index_list)
+                results = sort_puppet_objects(it, results, index_list)
     return results
 
 
@@ -34,7 +34,7 @@ def find_base_class(classes):
 
 
 def process_puppet_module(puppet_files, module_name, module_dir):
-    file_results = [sort_puppet_objects(f, PuppetClass) for f in puppet_files]
+    file_results = [sort_puppet_objects(f) for f in puppet_files]
 
     def get_type(t):
         return [r[1] for result in file_results if t in result for r in result[t]]
@@ -50,6 +50,12 @@ def process_puppet_module(puppet_files, module_name, module_dir):
     cron = get_resource_type("cron")
     files = get_resource_type("file")
     execs = get_resource_type("exec")
+
+    if not all([module_name in cl.name for cl in classes]):
+        add_log(module_name, LOG_TYPE_FATAL, (0, 0),
+                "Please check the provided module name and/or classes, the module name should be in the class names, "
+                "found: '%s'" % module_name, "")
+        return
 
     # Summary
     print("")

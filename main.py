@@ -4,7 +4,7 @@ import time
 from termcolor import colored
 
 from constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO
-from puppet_objects.puppet_class import PuppetFile
+from puppet_objects.puppet_file import PuppetFile
 from utility import get_file_contents, get_all_files, add_log, clear_logs, get_logs
 from walker import walk_content
 
@@ -25,11 +25,13 @@ def main(path, log_level=LOG_TYPE_ERROR):
 
     start = time.time()
 
+    total = []
+
     for f in puppet_files:
         print(colored("Processing file: .%s" % f.replace(path, ""), 'cyan'))
 
         try:
-            process_file(f)
+            total.append(process_file(f))
         except Exception as e:
             import traceback
             add_log(f, LOG_TYPE_FATAL, (0, 0), "FATAL: Panic during file parsing, " + str(e), "")
@@ -49,6 +51,8 @@ def main(path, log_level=LOG_TYPE_ERROR):
         clear_logs()
 
     print("parsing took %f seconds" % (time.time() - start))
+    for i in total:
+        i.print_items()
 
 
 if __name__ == '__main__':

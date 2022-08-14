@@ -1,6 +1,5 @@
 import os
 import re
-from typing import Pattern
 
 from constants import log_messages, CheckRegex, check_regex_list
 

@@ -77,7 +77,7 @@ def main(path, module_name, log_level=LOG_TYPE_WARNING, print_tree=False, only_p
 
     start = time.time()
 
-    process_puppet_module(total, module_name)
+    process_puppet_module(total, module_name, path)
     print_logs(log_level)
 
     print("validating took %f seconds" % (time.time() - start))

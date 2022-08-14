@@ -1,4 +1,6 @@
-from constants import LOG_TYPE_ERROR
+import os
+
+from constants import LOG_TYPE_ERROR, SPLIT_TOKEN
 from puppet_objects import PuppetObject
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -31,7 +33,7 @@ def find_base_class(classes):
             return i, c
 
 
-def process_puppet_module(puppet_files, module_name):
+def process_puppet_module(puppet_files, module_name, module_dir):
     file_results = [sort_puppet_objects(f, PuppetClass) for f in puppet_files]
 
     def get_type(t):
@@ -62,6 +64,7 @@ def process_puppet_module(puppet_files, module_name):
     print("")
 
     print("Starting validation of puppet objects:")
+
     # Verify all includes have a corresponding class to include.
     for i in includes:
         for c in classes:
@@ -70,3 +73,15 @@ def process_puppet_module(puppet_files, module_name):
         else:
             add_log(module_name, LOG_TYPE_ERROR, (0, 0),
                     "There was an include for %s but no class in the module" % i, "")
+
+    # Verify all files exist in the module files directory.
+    asset_files = os.listdir(module_dir + SPLIT_TOKEN + "files")
+
+    for f in get_resource_type("file"):
+        for i in f.items:
+            name, value = i.split("=>")
+            if name.rstrip() == "source":
+                value = value.replace("puppet:///modules/" + module_name + "/", "").replace("'", "").replace(" ", "").replace(",", "")
+                if value not in asset_files:
+                    add_log(module_name, LOG_TYPE_ERROR, (0, 0), "Puppet file has non existing puppet source: " + i, str(f))
+                    break

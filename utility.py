@@ -2,7 +2,7 @@ import os
 import re
 from typing import Pattern
 
-from constants import log_messages
+from constants import log_messages, CheckRegex, check_regex_list
 
 log_list = []
 
@@ -26,10 +26,11 @@ def get_logs():
     return log_list
 
 
-def check_regex(string, line_col, file, pattern: Pattern):
+def check_regex(string, line_col, file, check_regex: CheckRegex):
+    pattern = check_regex_list[check_regex]
     success = bool(pattern.match(string))
     if not success:
-        log_type, message = log_messages[pattern]
+        log_type, message = log_messages[check_regex]
         add_log(file.name, log_type, line_col, message, string)
     return success
 
@@ -59,8 +60,19 @@ def find_next_char(content, char):
     return index
 
 
-def get_until(content, char):
-    size = find_next_char(content, char)
+def find_next_string(content, string):
+    index = 0
+    while content[index:index+len(string)] != string:
+        index += 1
+    return index
+
+
+def get_until(content, char=None, string=None):
+    size = 0
+    if char:
+        size = find_next_char(content, char)
+    elif string:
+        size = find_next_string(content, string)
     return content[:size], size
 
 

@@ -1,9 +1,11 @@
-from constants import LOG_TYPE_FATAL, CHECK_RESOURCE_FIRST_LINE, CHECK_RESOURCE_ITEM_POINTER, CHECK_RESOURCE_ITEM_VALUE, \
-    CHECK_RESOURCE_ITEM_COMMA
+import string
+
+from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_INFO, LOG_TYPE_ERROR
 from puppet_objects.puppet_block import PuppetBlock
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
 from puppet_objects.puppet_class import PuppetClass
+from puppet_objects.puppet_include import PuppetInclude
 from puppet_objects.puppet_resource import PuppetResource
 from utility import strip_comments, brace_count_verify, add_log, get_until, get_matching_end_brace, count_newlines, \
     check_regex
@@ -34,7 +36,24 @@ def walk_block(content, line_number, puppet_file):
             # Found end of line
             line_number += 1
             index += 1
-        elif content[index:index+4] == "case":
+        elif char in ['}', '{']:
+            index += 1
+        elif content[index:index + 2] == "->":
+            if isinstance(puppet_block.items[-1], PuppetResource):
+                puppet_block.items[-1].set_dependency()
+            else:
+                add_log(puppet_file.name, LOG_TYPE_ERROR, (line_number, 0), "Dependency definition invalid",
+                        content[index:index + 2])
+            index += 2
+        elif content[index:index + 7] == "include":
+            index += 8  # include space after 'include'
+            name = ""
+            while content[index] in list(string.ascii_letters) + list(string.digits) + [':', '_']:
+                name += content[index]
+                index += 1
+            include = PuppetInclude(name)
+            puppet_block.add_item(include)
+        elif content[index:index + 4] == "case":
             index += 5  # include space after 'case'
             name, size = get_until(content[index:], ' ')
 
@@ -47,7 +66,7 @@ def walk_block(content, line_number, puppet_file):
             puppet_block.add_item(puppet_case)
             line_number += count_newlines(content[index:ind])
             index += ind - index
-        elif content[index:index+5] == "class":
+        elif content[index:index + 5] == "class":
             # Found class beginning
             index += 6  # include space after 'class'
 
@@ -68,7 +87,7 @@ def walk_block(content, line_number, puppet_file):
                      if content[index:].startswith(i) and "=>" not in get_until(content[index:], "\n")[0]]
             if len(items) == 1:
                 text, size = get_until(content[index:], "\n")
-                if not check_regex(text, (line_number, 0), puppet_file, CHECK_RESOURCE_FIRST_LINE):
+                if not check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_FIRST_LINE):
                     _, size = get_until(content[index:], '}')
                     index += size
                 else:
@@ -87,7 +106,9 @@ def walk_block(content, line_number, puppet_file):
                     line_number += count_newlines(content[index:ind])
                     index += ind - index + 1
             else:
-                # print("not implemented: ", char)
+                if content[index] != ' ':
+                    add_log(puppet_file.name, LOG_TYPE_INFO, (line_number, 0), "Unimplemented?",
+                            get_until(content[index:] + '\n', "\n")[0])
                 index += 1
     return puppet_block
 
@@ -156,9 +177,14 @@ def walk_resource(content, typ, line_number, puppet_file):
             index += 1
         elif char != ' ':
             text, size = get_until(content[index:], "\n")
-            if check_regex(text, (line_number, 0), puppet_file, CHECK_RESOURCE_ITEM_POINTER):
-                if check_regex(text, (line_number, 0), puppet_file, CHECK_RESOURCE_ITEM_VALUE):
-                    check_regex(text, (line_number, 0), puppet_file, CHECK_RESOURCE_ITEM_COMMA)
+            text2, _ = get_until(content[index + size + 1:] + "\n", "\n")
+            if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_POINTER):
+                if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_VALUE):
+                    if not check_regex_list[CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END].match(text + text2):
+                        check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_COMMA)
+                    else:
+                        check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN)
+
             puppet_resource.add_item(text)
             index += size
         else:

@@ -16,7 +16,7 @@ def process_file(path) -> PuppetFile:
     return puppet_file
 
 
-def main(path):
+def main(path, log_level=LOG_TYPE_ERROR):
     files = get_all_files(path)
     puppet_files = [f for f in files if f.endswith(".pp") and not f.split(SPLIT_TOKEN)[-1].startswith(".")]
 
@@ -31,18 +31,20 @@ def main(path):
         try:
             process_file(f)
         except Exception as e:
+            import traceback
             add_log(f, LOG_TYPE_FATAL, (0, 0), "FATAL: Panic during file parsing, " + str(e), "")
-
+            traceback.print_exc()
         for log_item in get_logs():
             typ = log_item[1]
-            if typ == LOG_TYPE_FATAL:
-                print(colored(log_item, 'white', 'on_red'))
-            if typ == LOG_TYPE_ERROR:
-                print(colored(log_item, 'red'))
-            if typ == LOG_TYPE_WARNING:
-                print(colored(log_item, 'yellow'))
-            if typ == LOG_TYPE_INFO:
-                print(colored(log_item, 'white'))
+            if typ >= log_level:
+                if typ == LOG_TYPE_FATAL:
+                    print(colored(log_item, 'white', 'on_red'))
+                if typ == LOG_TYPE_ERROR:
+                    print(colored(log_item, 'red'))
+                if typ == LOG_TYPE_WARNING:
+                    print(colored(log_item, 'yellow'))
+                if typ == LOG_TYPE_INFO:
+                    print(colored(log_item, 'white'))
 
         clear_logs()
 
@@ -51,4 +53,4 @@ def main(path):
 
 if __name__ == '__main__':
     check_path = "./ossec-development"
-    main(check_path)
+    main(check_path, log_level=0)

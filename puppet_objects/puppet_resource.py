@@ -2,6 +2,7 @@
 class PuppetResource:
     def __init__(self, typ):
         self.typ = typ
+        self.is_dependency = False
         self.name = ""
         self.items = []
 
@@ -12,5 +13,8 @@ class PuppetResource:
         for i in self.items:
             print("\t" * depth, i)
 
+    def set_dependency(self):
+        self.is_dependency = True
+
     def __repr__(self):
-        return '<PuppetResource \'%s\': \'%s\'>' % (self.typ, self.name)
+        return '<PuppetResource \'%s\': \'%s\', dependency: %d>' % (self.typ, self.name, self.is_dependency)

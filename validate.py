@@ -61,6 +61,7 @@ def process_puppet_module(puppet_files, module_name):
     print("Files:\t\t", ", ".join(list(set(f.name for f in files))))
     print("")
 
+    print("Starting validation of puppet objects:")
     # Verify all includes have a corresponding class to include.
     for i in includes:
         for c in classes:

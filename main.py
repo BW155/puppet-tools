@@ -19,6 +19,9 @@ def process_file(path) -> PuppetFile:
 
 
 def print_logs(log_level=1):
+    no_errors = True
+    no_warnings = True
+
     for log_item in get_logs():
         typ = log_item[1]
         if typ >= log_level:
@@ -26,15 +29,20 @@ def print_logs(log_level=1):
                 print(colored(log_item, 'white', 'on_red'))
             if typ == LOG_TYPE_ERROR:
                 print(colored(log_item, 'red'))
+                no_errors = False
             if typ == LOG_TYPE_WARNING:
                 print(colored(log_item, 'yellow'))
+                no_warnings = False
             if typ == LOG_TYPE_INFO:
                 print(colored(log_item, 'white'))
+
+    if no_errors and no_warnings:
+        print(colored("No Errors/Warnings Found", "green"))
 
     clear_logs()
 
 
-def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
+def main(path, module_name, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
     files = get_all_files(path)
     puppet_files = [f for f in files if f.endswith(".pp") and not f.split(SPLIT_TOKEN)[-1].startswith(".")]
 
@@ -69,7 +77,7 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
 
     start = time.time()
 
-    process_puppet_module(total, "ossec")
+    process_puppet_module(total, module_name)
     print_logs(log_level)
 
     print("validating took %f seconds" % (time.time() - start))
@@ -77,14 +85,8 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
 
 if __name__ == '__main__':
     my_parser = argparse.ArgumentParser(
-        description="Puppet Tools, including parser, linter and validator functions",
-        epilog='Enjoy the results! :)'
+        description="Puppet Tools, including parser, linter and validator functions"
     )
-
-    my_parser.add_argument("Path",
-                           metavar="path",
-                           type=str,
-                           help="the path to a puppet module")
 
     my_parser.add_argument("-t",
                            "--print-tree",
@@ -102,6 +104,16 @@ if __name__ == '__main__':
                            default=2,
                            help="Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5)")
 
+    my_parser.add_argument("Path",
+                           metavar="path",
+                           type=str,
+                           help="the path to a puppet module")
+
+    my_parser.add_argument("ModuleName",
+                           metavar="module_name",
+                           type=str,
+                           help="The name of the puppet module to be used")
+
     args = my_parser.parse_args()
 
     print(args)
@@ -111,4 +123,4 @@ if __name__ == '__main__':
         print("The path specified does not exist")
         exit(1)
 
-    main(check_path, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)
+    main(check_path, args.ModuleName, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)

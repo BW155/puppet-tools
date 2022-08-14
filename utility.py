@@ -61,7 +61,7 @@ def find_next_char(content, char):
 
 def find_next_string(content, string):
     index = 0
-    while content[index:index+len(string)] != string:
+    while content[index:index + len(string)] != string:
         index += 1
     return index
 
@@ -76,15 +76,7 @@ def get_until(content, char=None, string=None):
 
 
 def brace_count_verify(content):
-    counter = 0
-    index = 0
-    while index < len(content):
-        if content[index] == '{':
-            counter += 1
-        if content[index] == '}':
-            counter -= 1
-        index += 1
-    return counter
+    return content.count('{') - content.count('}')
 
 
 def get_matching_end_brace(content, index):

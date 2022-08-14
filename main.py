@@ -4,9 +4,9 @@ import time
 from termcolor import colored
 
 from constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO
+from parser import walk_content
 from puppet_objects.puppet_file import PuppetFile
 from utility import get_file_contents, get_all_files, add_log, clear_logs, get_logs
-from walker import walk_content
 
 
 def process_file(path) -> PuppetFile:
@@ -16,7 +16,7 @@ def process_file(path) -> PuppetFile:
     return puppet_file
 
 
-def main(path, log_level=LOG_TYPE_ERROR):
+def main(path, log_level=LOG_TYPE_WARNING):
     files = get_all_files(path)
     puppet_files = [f for f in files if f.endswith(".pp") and not f.split(SPLIT_TOKEN)[-1].startswith(".")]
 
@@ -52,6 +52,7 @@ def main(path, log_level=LOG_TYPE_ERROR):
 
     print("parsing took %f seconds" % (time.time() - start))
     for i in total:
+        print(i)
         i.print_items()
 
 

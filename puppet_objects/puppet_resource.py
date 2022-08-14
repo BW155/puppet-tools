@@ -1,4 +1,3 @@
-
 class PuppetResource:
     def __init__(self, typ):
         self.typ = typ

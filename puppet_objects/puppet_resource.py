@@ -6,7 +6,7 @@ class PuppetResource(PuppetObject):
     ALLOWED_RESOURCE_FILE_ITEMS = ["ensure", "path", "owner", "group", "mode", "source", "content", "recurse", "purge",
                                    "target", "backup", "checksum", "force", "ignore", "links", "recurselimit",
                                    "replace", "notify"]
-    ALLOWED_RESOURCE_SERVICE_ITEMS = ["name", "ensure", "enable", "hasrestart", "hasstatus"]
+    ALLOWED_RESOURCE_SERVICE_ITEMS = ["name", "ensure", "enable", "hasrestart", "hasstatus", "subscribe"]
 
     def __init__(self, typ):
         self.typ = typ

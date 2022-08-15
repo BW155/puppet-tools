@@ -129,10 +129,10 @@ def walk_case(content, name, line_number, puppet_file):
 
     while index < len(content):
         char = content[index]
-        if char == "'":
+        if char == "'" or char == "\"":
             # TODO: Validate through regex
             index += 1
-            name, size = get_until(content[index:], "'")
+            name, size = get_until(content[index:], "'", or_char="\"")
             index += size
 
             _, size = get_until(content[index:], ':')
@@ -162,9 +162,9 @@ def walk_resource(content, typ, line_number, puppet_file):
     puppet_resource = PuppetResource(typ)
     index = 0
 
-    _, size = get_until(content[index:], "'")
+    _, size = get_until(content[index:], "'", or_char='"')
     index += size + 1
-    name, size = get_until(content[index:], "'")
+    name, size = get_until(content[index:], "'", or_char='"')
     puppet_resource.name = name
     index += size
     _, size = get_until(content[index:], ':')

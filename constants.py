@@ -15,7 +15,7 @@ class CheckRegex(Enum):
 
 
 check_regex_list = {
-    CheckRegex.CHECK_RESOURCE_FIRST_LINE: re.compile(r"[a-z]* *{ *'[\S ]*' *:"),
+    CheckRegex.CHECK_RESOURCE_FIRST_LINE: re.compile(r"[a-z]* *{ *['\"][\S ]*['|\"] *:"),
     CheckRegex.CHECK_RESOURCE_ITEM_POINTER: re.compile(r"\S+[ ]*=>"),
     CheckRegex.CHECK_RESOURCE_ITEM_VALUE: re.compile(r"\S+[ ]*=>[ ]*.*"),
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA: re.compile(r"\S+[ ]*=>[ ]*.*,"),
@@ -40,3 +40,5 @@ log_messages = {
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END: (
     LOG_TYPE_IGNORE, "Resource item ends the resource but does not have a comma at the end"),
 }
+
+

@@ -1,5 +1,7 @@
 import os
 
+from termcolor import colored
+
 from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL
 from puppet_objects import PuppetObject
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -71,6 +73,27 @@ def process_puppet_module(puppet_files, module_name, module_dir):
     print("Starting validation of puppet objects:")
 
     # Verify all includes have a corresponding class to include.
+    verify(verify_includes, {"includes": includes, "classes": classes, "module_name": module_name},
+           "All includes have a corresponding class to include")
+
+    # Verify all resource items
+    verify(verify_resource_items, {"resources": get_type(PuppetResource), "module_name": module_name},
+           "All resources have valid items")
+
+    # Verify all files exist in the module files directory.
+    verify(verify_resource_file_sources, {"module_dir": module_dir,
+                                          "file_resource_sources": get_resource_type("file"),
+                                          "module_name": module_name},
+           "All resource file sources are available in the module")
+
+
+def verify(method, args, name):
+    errors = method(**args)
+    print(colored(("️❌" if errors else "✔") + " Verified " + name, "red" if errors else "green"))
+
+
+def verify_includes(includes, classes, module_name):
+    errors = False
     for i in includes:
         for c in classes:
             if i.name == c.name:
@@ -78,15 +101,44 @@ def process_puppet_module(puppet_files, module_name, module_dir):
         else:
             add_log(module_name, LOG_TYPE_ERROR, (0, 0),
                     "There was an include for %s but no class in the module" % i, "")
+            errors = True
+    return errors
 
-    # Verify all files exist in the module files directory.
+
+def verify_resource_items(resources, module_name):
+    errors = False
+    for r in resources:
+        for val in r.items:
+            name, _ = val.split("=>")
+            name = name.rstrip()
+            # value = value.lstrip()
+            if r.typ == "file":
+                if name not in PuppetResource.ALLOWED_RESOURCE_FILE_ITEMS:
+                    add_log(module_name, LOG_TYPE_ERROR, (0, 0),
+                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name), str(r))
+                    errors = True
+            if r.typ == "service":
+                if name not in PuppetResource.ALLOWED_RESOURCE_SERVICE_ITEMS:
+                    add_log(module_name, LOG_TYPE_ERROR, (0, 0),
+                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name), str(r))
+                    errors = True
+    return errors
+
+
+def verify_resource_file_sources(module_dir, file_resource_sources, module_name):
     asset_files = os.listdir(module_dir + SPLIT_TOKEN + "files")
+    errors = False
 
-    for f in get_resource_type("file"):
+    for f in file_resource_sources:
         for i in f.items:
             name, value = i.split("=>")
             if name.rstrip() == "source":
-                value = value.replace("puppet:///modules/" + module_name + "/", "").replace("'", "").replace(" ", "").replace(",", "")
+                value = value.replace("puppet:///modules/" + module_name + "/", "").replace("'", "").replace(" ",
+                                                                                                             "").replace(
+                    ",", "")
                 if value not in asset_files:
-                    add_log(module_name, LOG_TYPE_ERROR, (0, 0), "Puppet file has non existing puppet source: " + i, str(f))
+                    add_log(module_name, LOG_TYPE_ERROR, (0, 0), "Puppet file has non existing puppet source: " + i,
+                            str(f))
+                    errors = True
                     break
+    return errors

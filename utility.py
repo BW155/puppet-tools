@@ -52,10 +52,13 @@ def get_file_contents(path):
         return f.read()
 
 
-def find_next_char(content, char):
+def find_next_char(content, char, or_char=None):
+    chars = [char, or_char]
     index = 0
-    while content[index] != char:
+
+    while content[index] not in chars:
         index += 1
+
     return index
 
 
@@ -66,12 +69,13 @@ def find_next_string(content, string):
     return index
 
 
-def get_until(content, char=None, string=None):
+def get_until(content, char=None, string=None, or_char=None):
     size = 0
     if char:
-        size = find_next_char(content, char)
+        size = find_next_char(content, char, or_char)
     elif string:
         size = find_next_string(content, string)
+
     return content[:size], size
 
 

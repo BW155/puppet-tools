@@ -8,6 +8,7 @@ from puppet_objects.puppet_case_item import PuppetCaseItem
 from puppet_objects.puppet_class import PuppetClass
 from puppet_objects.puppet_include import PuppetInclude
 from puppet_objects.puppet_resource import PuppetResource
+from puppet_objects.puppet_variable import PuppetVariable
 from utility import add_log
 
 
@@ -51,6 +52,7 @@ def process_puppet_module(puppet_files, module_name, module_dir):
     cron = get_resource_type("cron")
     files = get_resource_type("file")
     execs = get_resource_type("exec")
+    variables = get_type(PuppetVariable)
 
     if not all([module_name in cl.name for cl in classes]):
         add_log(module_name, LOG_TYPE_FATAL, (0, 0),
@@ -59,7 +61,7 @@ def process_puppet_module(puppet_files, module_name, module_dir):
         return
 
     # Summary
-    print("")
+    print()
     print("Module '%s' Content Summary:" % module_name)
     print("Classes:\t", ", ".join(list(set(c.name for c in classes))))
     print("Case items:\t", ", ".join(list(set(c.name for c in case_items))))
@@ -68,7 +70,8 @@ def process_puppet_module(puppet_files, module_name, module_dir):
     print("Services:\t", ", ".join(list(set(s.name for s in services))))
     print("Cron:\t\t", ", ".join(list(set(c.name for c in cron))))
     print("Files:\t\t", ", ".join(list(set(f.name for f in files))))
-    print("")
+    print("Variables:\t", ", ".join(list(set(v.name for v in variables))))
+    print()
 
     print("Starting validation of puppet objects:")
 

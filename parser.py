@@ -7,6 +7,7 @@ from puppet_objects.puppet_case_item import PuppetCaseItem
 from puppet_objects.puppet_class import PuppetClass
 from puppet_objects.puppet_include import PuppetInclude
 from puppet_objects.puppet_resource import PuppetResource
+from puppet_objects.puppet_variable import PuppetVariable
 from utility import strip_comments, brace_count_verify, add_log, get_until, get_matching_end_brace, count_newlines, \
     check_regex
 
@@ -38,6 +39,15 @@ def walk_block(content, line_number, puppet_file):
             index += 1
         elif char in ['}', '{']:
             index += 1
+        elif char == '$':
+            index += 1
+            name, size = get_until(content[index:], '=')
+            puppet_variable = PuppetVariable(name.lstrip().rstrip())
+            index += size + 1
+            value, size = get_until(content[index:], "\n")
+            puppet_variable.value = value.lstrip().rstrip()
+            puppet_block.add_item(puppet_variable)
+            index += size
         elif content[index:index + 2] == "->":
             if isinstance(puppet_block.items[-1], PuppetResource):
                 puppet_block.items[-1].set_dependency()
@@ -76,14 +86,11 @@ def walk_block(content, line_number, puppet_file):
                 break
             index += 6  # include space after 'class'
 
-            name, size = get_until(content[index:], ' ')
-            index += size
-
-            _, size = get_until(content[index:], '{')
+            name, size = get_until(content[index:], '{')
             index += size
 
             ind = get_matching_end_brace(content, index)
-            puppet_class = walk_class(content[index:ind], name, line_number, puppet_file)
+            puppet_class = walk_class(content[index:ind], name.rstrip(), line_number, puppet_file)
 
             puppet_block.add_item(puppet_class)
             line_number += count_newlines(content[index:ind])

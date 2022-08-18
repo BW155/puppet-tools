@@ -45,7 +45,7 @@ def walk_block(content, line_number, puppet_file):
             puppet_variable = PuppetVariable(name.lstrip().rstrip())
             index += size + 1
             value, size = get_until(content[index:], "\n")
-            puppet_variable.value = value.lstrip().rstrip()
+            puppet_variable.set_value(value.lstrip().rstrip())
             puppet_block.add_item(puppet_variable)
             index += size
         elif content[index:index + 2] == "->":

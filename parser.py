@@ -120,8 +120,9 @@ def walk_block(content, line_number, puppet_file):
                     index += ind - index + 1
             else:
                 if content[index] != ' ':
-                    add_log(puppet_file.name, LOG_TYPE_INFO, (line_number, 0), "Unimplemented?",
-                            get_until(content[index:] + '\n', "\n")[0])
+                    text, size = get_until(content[index:] + '\n', "\n")
+                    add_log(puppet_file.name, LOG_TYPE_INFO, (line_number, 0), "Unimplemented?", text)
+                    index += size
                 index += 1
     return puppet_block
 

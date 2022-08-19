@@ -1,6 +1,6 @@
 import string
 
-from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_INFO, LOG_TYPE_ERROR
+from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_INFO, LOG_TYPE_ERROR, LOG_TYPE_DEBUG
 from puppet_objects.puppet_block import PuppetBlock
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -70,13 +70,12 @@ def walk_block(content, line_number, puppet_file):
             if not check_regex(content[index:], (line_number, 0), puppet_file, CheckRegex.CHECK_CASE_LINE):
                 break
             index += 5  # include space after 'case'
-            name, size = get_until(content[index:], ' ')
 
-            _, size = get_until(content[index:], '{')
+            name, size = get_until(content[index:], '{')
             index += size
 
             ind = get_matching_end_brace(content, index)
-            puppet_case = walk_case(content[index:ind], name, line_number, puppet_file)
+            puppet_case = walk_case(content[index:ind], name.rstrip(), line_number, puppet_file)
 
             puppet_block.add_item(puppet_case)
             line_number += count_newlines(content[index:ind])
@@ -121,7 +120,7 @@ def walk_block(content, line_number, puppet_file):
             else:
                 if content[index] != ' ':
                     text, size = get_until(content[index:] + '\n', "\n")
-                    add_log(puppet_file.name, LOG_TYPE_INFO, (line_number, 0), "Unimplemented?", text)
+                    add_log(puppet_file.name, LOG_TYPE_DEBUG, (line_number, 0), "Unimplemented?", text)
                     index += size
                 index += 1
     return puppet_block

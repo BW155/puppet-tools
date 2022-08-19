@@ -4,7 +4,7 @@ import argparse
 
 from termcolor import colored
 
-from constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO
+from constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO, LOG_TYPE_DEBUG
 from parser import walk_content
 from puppet_objects.puppet_file import PuppetFile
 from utility import get_file_contents, get_all_files, add_log, clear_logs, get_logs
@@ -35,6 +35,8 @@ def print_logs(log_level=1):
                 no_warnings = False
             if typ == LOG_TYPE_INFO:
                 print(colored(log_item, 'white'))
+            if typ == LOG_TYPE_DEBUG:
+                print(colored(log_item, 'cyan'))
 
     if no_errors and no_warnings:
         print(colored("No Errors/Warnings Found", "green"))

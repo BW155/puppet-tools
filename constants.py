@@ -43,10 +43,8 @@ log_messages = {
     CheckRegex.CHECK_RESOURCE_ITEM_POINTER: (LOG_TYPE_ERROR, "Resource item does not have a valid format"),
     CheckRegex.CHECK_RESOURCE_ITEM_VALUE: (LOG_TYPE_ERROR, "Resource item does not have a value"),
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA: (LOG_TYPE_ERROR, "Resource item does not have a comma at the end"),
-    CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN: (
-        LOG_TYPE_WARNING, "Resource item does not end with a comma, styling issue"),
-    CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END: (
-        LOG_TYPE_IGNORE, "Resource item ends the resource but does not have a comma at the end"),
+    CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN: (LOG_TYPE_INFO, "Resource item does not end with a comma, styling issue"),
+    CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END: (LOG_TYPE_IGNORE, "Resource item ends the resource but does not have a comma at the end"),
     CheckRegex.CHECK_INCLUDE_LINE: (LOG_TYPE_ERROR, "Include line is not valid"),
     CheckRegex.CHECK_CASE_LINE: (LOG_TYPE_ERROR, "Case line is not valid"),
     CheckRegex.CHECK_CLASS_LINE: (LOG_TYPE_ERROR, "Class line is not valid"),

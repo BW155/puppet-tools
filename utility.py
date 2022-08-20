@@ -1,7 +1,7 @@
 import os
 import re
 
-from constants import log_messages, CheckRegex, check_regex_list
+from constants import LOG_MESSAGES, CheckRegex, check_regex_list, LOG_TYPE_ERROR
 
 log_list = []
 
@@ -14,6 +14,10 @@ def strip_comments(code):
 def add_log(file_name, typ, line_col, message, string):
     global log_list
     log_list.append((file_name, typ, line_col, message, string))
+
+
+def logs_contains_error():
+    return any([i[1] >= LOG_TYPE_ERROR for i in log_list])
 
 
 def clear_logs():
@@ -29,7 +33,7 @@ def check_regex(string, line_col, file, check_regex: CheckRegex):
     pattern = check_regex_list[check_regex]
     success = bool(pattern.match(string))
     if not success:
-        log_type, message = log_messages[check_regex]
+        log_type, message = LOG_MESSAGES[check_regex]
         add_log(file.name, log_type, line_col, message, string)
     return success
 

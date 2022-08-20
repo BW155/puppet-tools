@@ -35,7 +35,7 @@ def find_base_class(classes):
             return i, c
 
 
-def process_puppet_module(puppet_files, module_name, module_dir):
+def validate_puppet_module(puppet_files, module_name, module_dir):
     file_results = [sort_puppet_objects(f) for f in puppet_files]
 
     def get_type(t):

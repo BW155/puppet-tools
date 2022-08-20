@@ -4,6 +4,13 @@ from enum import Enum
 
 SPLIT_TOKEN = "\\" if os.name == "nt" else "/"
 
+LOG_TYPE_IGNORE = 0
+LOG_TYPE_DEBUG = 1
+LOG_TYPE_INFO = 2
+LOG_TYPE_WARNING = 3
+LOG_TYPE_ERROR = 4
+LOG_TYPE_FATAL = 5
+
 
 class CheckRegex(Enum):
     CHECK_RESOURCE_FIRST_LINE = 1
@@ -31,14 +38,7 @@ check_regex_list = {
     CheckRegex.CHECK_CASE_ITEM_LINE: re.compile(r"'\S+' *: *{")
 }
 
-LOG_TYPE_IGNORE = 0
-LOG_TYPE_DEBUG = 1
-LOG_TYPE_INFO = 2
-LOG_TYPE_WARNING = 3
-LOG_TYPE_ERROR = 4
-LOG_TYPE_FATAL = 5
-
-log_messages = {
+LOG_MESSAGES = {
     CheckRegex.CHECK_RESOURCE_FIRST_LINE: (LOG_TYPE_ERROR, "Resource invalid"),
     CheckRegex.CHECK_RESOURCE_ITEM_POINTER: (LOG_TYPE_ERROR, "Resource item does not have a valid format"),
     CheckRegex.CHECK_RESOURCE_ITEM_VALUE: (LOG_TYPE_ERROR, "Resource item does not have a value"),

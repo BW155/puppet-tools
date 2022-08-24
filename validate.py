@@ -35,7 +35,7 @@ def find_base_class(classes):
             return i, c
 
 
-def validate_puppet_module(puppet_files, module_name, module_dir):
+def validate_puppet_module(puppet_files, module_dir):
     file_results = [sort_puppet_objects(f) for f in puppet_files]
 
     def get_type(t):
@@ -53,6 +53,9 @@ def validate_puppet_module(puppet_files, module_name, module_dir):
     files = get_resource_type("file")
     execs = get_resource_type("exec")
     variables = get_type(PuppetVariable)
+
+    class_names = [c.name for c in classes]
+    module_name = class_names[0].split("::")[0]
 
     if not all([module_name in cl.name for cl in classes]):
         add_log(module_name, LOG_TYPE_FATAL, (0, 0),

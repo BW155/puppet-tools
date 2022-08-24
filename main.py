@@ -72,7 +72,7 @@ def parse(puppet_files, path, log_level):
     return total
 
 
-def main(path, module_name, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
+def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
     files = get_all_files(path)
     puppet_files = [f for f in files if f.endswith(".pp") and not f.split(SPLIT_TOKEN)[-1].startswith(".")]
 
@@ -91,7 +91,7 @@ def main(path, module_name, log_level=LOG_TYPE_WARNING, print_tree=False, only_p
 
     start = time.time()
 
-    validate_puppet_module(total, module_name, path)
+    validate_puppet_module(total, path)
     print_logs(log_level)
 
     print("validating took %f seconds" % (time.time() - start))
@@ -126,11 +126,6 @@ if __name__ == '__main__':
                            type=str,
                            help="the path to a puppet module")
 
-    my_parser.add_argument("ModuleName",
-                           metavar="module_name",
-                           type=str,
-                           help="The name of the puppet module to be used")
-
     args = my_parser.parse_args()
 
     check_path = args.Path
@@ -143,4 +138,4 @@ if __name__ == '__main__':
         print("Not a valid puppet module structure at path")
         exit(1)
 
-    main(check_path, args.ModuleName, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)
+    main(check_path, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)

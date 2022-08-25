@@ -23,9 +23,6 @@ def process_file(path) -> PuppetFile:
 
 
 def print_logs(log_level=1):
-    no_errors = True
-    no_warnings = True
-
     for log_item in get_logs():
         typ = log_item[1]
         if typ >= log_level:
@@ -33,17 +30,12 @@ def print_logs(log_level=1):
                 print(colored(log_item, 'white', 'on_red'))
             if typ == LOG_TYPE_ERROR:
                 print(colored(log_item, 'red'))
-                no_errors = False
             if typ == LOG_TYPE_WARNING:
                 print(colored(log_item, 'yellow'))
-                no_warnings = False
             if typ == LOG_TYPE_INFO:
                 print(colored(log_item, 'white'))
             if typ == LOG_TYPE_DEBUG:
                 print(colored(log_item, 'cyan'))
-
-    # if no_errors and no_warnings:
-    #       print(colored("No Errors/Warnings Found", "green"))
 
     clear_logs()
 
@@ -73,7 +65,7 @@ def parse(puppet_files, path, log_level):
 
 
 def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
-    files = get_all_files(path)
+    files = get_all_files(os.path.join(path, "manifests"))
     puppet_files = [f for f in files if f.endswith(".pp") and not f.split(SPLIT_TOKEN)[-1].startswith(".")]
 
     path = os.path.normpath(path)
@@ -134,7 +126,8 @@ if __name__ == '__main__':
         print("The path specified does not exist")
         exit(1)
 
-    if not os.path.exists(os.path.join(check_path, "files")) or not os.path.exists(os.path.join(check_path, "manifests")):
+    if not os.path.exists(os.path.join(check_path, "files")) or not \
+            os.path.exists(os.path.join(check_path, "manifests")):
         print("Not a valid puppet module structure at path")
         exit(1)
 

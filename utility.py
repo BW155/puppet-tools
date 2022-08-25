@@ -29,11 +29,11 @@ def get_logs():
     return log_list
 
 
-def check_regex(string, line_col, file, check_regex: CheckRegex):
-    pattern = check_regex_list[check_regex]
+def check_regex(string, line_col, file, regex_check_name: CheckRegex):
+    pattern = check_regex_list[regex_check_name]
     success = bool(pattern.match(string))
     if not success:
-        log_type, message = LOG_MESSAGES[check_regex]
+        log_type, message = LOG_MESSAGES[regex_check_name]
         add_log(file.name, log_type, line_col, message, string)
     return success
 

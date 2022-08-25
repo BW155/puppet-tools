@@ -14,7 +14,16 @@ class PuppetResource(PuppetObject):
         self.name = ""
         self.items = []
 
-    def add_item(self, item):
+    def get_value_for_item_name(self, search_name):
+        result = None
+        for i in self.items:
+            name, value = i.split("=>")
+            if name.lstrip().rstrip() == search_name:
+                result = value.lstrip().rstrip()
+
+        return result
+
+    def add_item(self, item: str):
         self.items.append(item)
 
     def print_items(self, depth=0):

@@ -2,7 +2,7 @@ import os
 
 from termcolor import colored
 
-from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL
+from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_WARNING, LOG_TYPE_DEBUG
 from puppet_objects import PuppetObject
 from puppet_objects.puppet_case_item import PuppetCaseItem
 from puppet_objects.puppet_class import PuppetClass
@@ -84,7 +84,17 @@ def validate_puppet_module(puppet_files, module_dir):
 
     # Verify all resource items
     verify(verify_resource_items, {"resources": get_type(PuppetResource), "module_name": module_name},
-           "All resources have valid items")
+           "All resources have valid references")
+
+    # Verify all resource item references
+    verify(verify_resource_item_references, {
+        "resources": get_type(PuppetResource),
+        "services": services,
+        "module_name": module_name,
+        "execs": execs,
+        "packages": packages,
+        "files": files
+    }, "All resources have valid items")
 
     # Verify all files exist in the module files directory.
     verify(verify_resource_file_sources, {"module_dir": module_dir,
@@ -117,17 +127,92 @@ def verify_resource_items(resources, module_name):
         for val in r.items:
             name, _ = val.split("=>")
             name = name.rstrip()
-            # value = value.lstrip()
+
             if r.typ == "file":
                 if name not in PuppetResource.ALLOWED_RESOURCE_FILE_ITEMS:
                     add_log(module_name, LOG_TYPE_ERROR, (0, 0),
-                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name), str(r))
+                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
+                            str(r))
                     errors = True
             if r.typ == "service":
                 if name not in PuppetResource.ALLOWED_RESOURCE_SERVICE_ITEMS:
                     add_log(module_name, LOG_TYPE_ERROR, (0, 0),
-                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name), str(r))
+                            "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
+                            str(r))
                     errors = True
+    return errors
+
+
+def find_any_path(resources, search_path):
+    paths = list(set([p.replace("'", "").replace(",", "") for p in [r.get_value_for_item_name("path") for r in resources] if p]))
+
+    for path in paths:
+        if path == search_path:
+            return True
+    return False
+
+
+def verify_resource_item_references(resources, services, files, execs, packages, module_name):
+    errors = False
+
+    service_names = [s.name for s in services]
+    file_names = [f.name for f in files]
+    exec_names = [e.name for e in execs]
+    package_names = [p.name for p in packages]
+
+    for r in resources:
+        for val in r.items:
+            _, value = val.split("=>")
+            value = value.lstrip().replace(",", "")
+
+            if value.startswith("Service"):
+                service_name = value.replace("Service['", "").replace("']", "")
+                if service_name not in service_names:
+                    add_log(
+                        module_name, LOG_TYPE_WARNING, (0, 0),
+                        "Resource %s '%s' has a reference to Service '%s' but couldn't be found, may exist in parent "
+                        "module" % (r.typ, r.name, service_name), str(r))
+            elif value.startswith("File"):
+                file_name = value.replace("File['", "").replace("']", "")
+
+                if file_name not in file_names and not find_any_path(files, file_name):
+                    add_log(
+                        module_name, LOG_TYPE_WARNING, (0, 0),
+                        "Resource %s '%s' has a reference to File '%s' but couldn't be found, may exist in parent "
+                        "module" % (r.typ, r.name, file_name), str(r))
+            elif value.startswith("Exec"):
+                exec_name = value.replace("Exec['", "").replace("']", "")
+                if exec_name not in exec_names:
+                    add_log(
+                        module_name, LOG_TYPE_WARNING, (0, 0),
+                        "Resource %s '%s' has a reference to Exec '%s' but couldn't be found, may exist in parent "
+                        "module" % (r.typ, r.name, exec_name), str(r))
+            elif value.startswith("Package"):
+                package_name = value.replace("Package['", "").replace("']", "")
+                if package_name not in package_names:
+                    add_log(
+                        module_name, LOG_TYPE_WARNING, (0, 0),
+                        "Resource %s '%s' has a reference to Package '%s' but couldn't be found, may exist in parent "
+                        "module" % (r.typ, r.name, package_name), str(r))
+            elif value.startswith("template"):
+                pass  # TODO: Implement template validation
+            elif value.startswith("'"):
+                pass
+            elif value == "file":
+                pass
+            elif value == "directory":
+                pass
+            elif value == "true" or value == "false":
+                pass
+            elif value.isnumeric():
+                pass
+            elif value == "absent":
+                pass
+            elif value.startswith("[") and value.endswith("]"):
+                pass
+            else:
+                add_log(module_name, LOG_TYPE_DEBUG, (0, 0), "Unimplemented?", value)
+
     return errors
 
 
@@ -139,9 +224,10 @@ def verify_resource_file_sources(module_dir, file_resource_sources, module_name)
         for i in f.items:
             name, value = i.split("=>")
             if name.rstrip() == "source":
-                value = value.replace("puppet:///modules/" + module_name + "/", "").replace("'", "").replace(" ",
-                                                                                                             "").replace(
-                    ",", "")
+                value = value.replace("puppet:///modules/" + module_name + "/", "")\
+                    .replace("'", "")\
+                    .replace(" ", "")\
+                    .replace(",", "")
                 if value not in asset_files:
                     add_log(module_name, LOG_TYPE_ERROR, (0, 0), "Puppet file has non existing puppet source: " + i,
                             str(f))

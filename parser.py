@@ -1,6 +1,6 @@
 import string
 
-from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_INFO, LOG_TYPE_ERROR, LOG_TYPE_DEBUG
+from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_ERROR, LOG_TYPE_DEBUG
 from puppet_objects.puppet_block import PuppetBlock
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -12,7 +12,7 @@ from utility import strip_comments, brace_count_verify, add_log, get_until, get_
     check_regex
 
 
-def walk_content(content, puppet_file, index=0, line_number=1):
+def walk_content(content, puppet_file, line_number=1):
     content = strip_comments(content)
     result = brace_count_verify(content)
     if result == 0:
@@ -195,12 +195,13 @@ def walk_resource(content, typ, line_number, puppet_file):
             text2, _ = get_until(content[index + size + 1:] + "\n", "\n")
             if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_POINTER):
                 if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_VALUE):
+                    # Next one may be ignored but makes a difference for the next check
                     if not check_regex_list[CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END].match(text + text2):
                         check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_COMMA)
+                        puppet_resource.add_item(text)
                     else:
                         check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN)
-
-            puppet_resource.add_item(text)
+                        puppet_resource.add_item(text)
             index += size
         else:
             index += 1

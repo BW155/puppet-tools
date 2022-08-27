@@ -14,11 +14,13 @@ class PuppetResource(PuppetObject):
     ALLOWED_RESOURCE_EXEC_ITEMS = ["command", "path", "returns", "environment", "creates", "refreshonly", "onlyif", "unless"] + META_PARAMETERS
     ALLOWED_RESOURCE_CRON_ITEMS = ["command", "special", "user", "hour", "minute", "ensure"] + META_PARAMETERS
 
-    def __init__(self, typ):
+    def __init__(self, typ, line_number, file_name):
         self.typ = typ
         self.is_dependency = False
         self.name = ""
         self.items = []
+        self.line_number = line_number
+        self.file_name = file_name
 
     def get_value_for_item_name(self, search_name):
         result = None

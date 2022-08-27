@@ -191,7 +191,7 @@ def walk_case(content, name, line_number, puppet_file):
 
 
 def walk_resource(content, typ, line_number, puppet_file):
-    puppet_resource = PuppetResource(typ)
+    puppet_resource = PuppetResource(typ, line_number, puppet_file.name)
     index = 0
 
     _, size = get_until(content[index:], "'", or_char='"')

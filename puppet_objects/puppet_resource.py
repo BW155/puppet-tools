@@ -2,11 +2,17 @@ from puppet_objects import PuppetObject
 
 
 class PuppetResource(PuppetObject):
-    TYPES = ["package", "file", "service", "cron", "exec"]
+    TYPES = ["package", "file", "service", "cron", "exec", "stage", "firewall"]
+
+    META_PARAMETERS = ["alias", "audit", "before", "loglevel", "noop", "notify", "require", "schedule", "stage", "subscribe", "tag"]
+
     ALLOWED_RESOURCE_FILE_ITEMS = ["ensure", "path", "owner", "group", "mode", "source", "content", "recurse", "purge",
                                    "target", "backup", "checksum", "force", "ignore", "links", "recurselimit",
-                                   "replace", "notify"]
-    ALLOWED_RESOURCE_SERVICE_ITEMS = ["name", "ensure", "enable", "hasrestart", "hasstatus", "subscribe"]
+                                   "replace"] + META_PARAMETERS
+    ALLOWED_RESOURCE_SERVICE_ITEMS = ["name", "ensure", "enable", "hasrestart", "hasstatus"] + META_PARAMETERS
+    ALLOWED_RESOURCE_PACKAGE_ITEMS = ["name", "ensure", "source", "provider"] + META_PARAMETERS
+    ALLOWED_RESOURCE_EXEC_ITEMS = ["command", "path", "returns", "environment", "creates", "refreshonly", "onlyif", "unless"] + META_PARAMETERS
+    ALLOWED_RESOURCE_CRON_ITEMS = ["command", "special", "user", "hour", "minute", "ensure"] + META_PARAMETERS
 
     def __init__(self, typ):
         self.typ = typ

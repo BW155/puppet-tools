@@ -22,7 +22,8 @@ class CheckRegex(Enum):
     CHECK_INCLUDE_LINE = 7
     CHECK_CASE_LINE = 8
     CHECK_CLASS_LINE = 9
-    CHECK_CASE_ITEM_LINE = 10
+    CHECK_CLASS_LINE2 = 10
+    CHECK_CASE_ITEM_LINE = 11
 
 
 check_regex_list = {
@@ -35,6 +36,7 @@ check_regex_list = {
     CheckRegex.CHECK_INCLUDE_LINE: re.compile(r"include \S+ *} *$"),
     CheckRegex.CHECK_CASE_LINE: re.compile(r"case \S+ *{"),
     CheckRegex.CHECK_CLASS_LINE: re.compile(r"class \S+ *{"),
+    CheckRegex.CHECK_CLASS_LINE2: re.compile(r"class *{ *[\"']\S+[\"'] *:"),
     CheckRegex.CHECK_CASE_ITEM_LINE: re.compile(r"'\S+' *: *{")
 }
 
@@ -48,5 +50,6 @@ LOG_MESSAGES = {
     CheckRegex.CHECK_INCLUDE_LINE: (LOG_TYPE_ERROR, "Include line is not valid"),
     CheckRegex.CHECK_CASE_LINE: (LOG_TYPE_ERROR, "Case line is not valid"),
     CheckRegex.CHECK_CLASS_LINE: (LOG_TYPE_ERROR, "Class line is not valid"),
+    CheckRegex.CHECK_CLASS_LINE2: (LOG_TYPE_ERROR, "Class line is not valid"),
     CheckRegex.CHECK_CASE_ITEM_LINE: (LOG_TYPE_ERROR, "Case Item line is not valid")
 }

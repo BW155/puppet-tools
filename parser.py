@@ -1,6 +1,6 @@
 import string
 
-from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_ERROR, LOG_TYPE_DEBUG
+from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_ERROR, LOG_TYPE_DEBUG, LOG_MESSAGES
 from puppet_objects.puppet_block import PuppetBlock
 from puppet_objects.puppet_case import PuppetCase
 from puppet_objects.puppet_case_item import PuppetCaseItem
@@ -81,22 +81,43 @@ def walk_block(content, line_number, puppet_file):
             line_number += count_newlines(content[index:ind])
             index += ind - index
         elif content[index:index + 5] == "class":
-            if not check_regex(content[index:], (line_number, 0), puppet_file, CheckRegex.CHECK_CLASS_LINE):
+            if check_regex(content[index:], (line_number, 0), puppet_file, CheckRegex.CHECK_CLASS_LINE, disable_log=True):
+                index += 6  # include space after 'class'
+                name, size = get_until(content[index:], '{')
+                index += size
+
+                ind = get_matching_end_brace(content, index)
+                puppet_class = walk_class(content[index:ind], name.rstrip(), line_number, puppet_file)
+
+                puppet_block.add_item(puppet_class)
+                line_number += count_newlines(content[index:ind])
+                index += ind - index
+            elif check_regex(content[index:], (line_number, 0), puppet_file, CheckRegex.CHECK_CLASS_LINE2, disable_log=True):
+                index += 6  # include space after 'class'
+                _, size = get_until(content[index:], '{')
+                index += size
+
+                brace_index = index
+                index += 1
+
+                name, size = get_until(content[index:], ":")
+                index += size + 1
+
+                ind = get_matching_end_brace(content, brace_index)
+                puppet_class = walk_class(content[index:ind], name.rstrip(), line_number, puppet_file)
+
+                puppet_block.add_item(puppet_class)
+                line_number += count_newlines(content[index:ind])
+                index += ind - index
+            else:
+                log_type, message = LOG_MESSAGES[CheckRegex.CHECK_CLASS_LINE]
+                add_log(puppet_file.name, log_type, (line_number, 0), message, content[index:])
                 break
-            index += 6  # include space after 'class'
 
-            name, size = get_until(content[index:], '{')
-            index += size
-
-            ind = get_matching_end_brace(content, index)
-            puppet_class = walk_class(content[index:ind], name.rstrip(), line_number, puppet_file)
-
-            puppet_block.add_item(puppet_class)
-            line_number += count_newlines(content[index:ind])
-            index += ind - index
         else:
             items = [len(i) for i in PuppetResource.TYPES
-                     if content[index:].startswith(i) and "=>" not in get_until(content[index:], "\n")[0]]
+                     if content[index:].startswith(i) and "=>" not in get_until(content[index:], "\n", or_char=":")[0]]
+
             if len(items) == 1:
                 text, size = get_until(content[index:], "\n")
                 if not check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_FIRST_LINE):
@@ -120,7 +141,7 @@ def walk_block(content, line_number, puppet_file):
             else:
                 if content[index] != ' ':
                     text, size = get_until(content[index:] + '\n', "\n")
-                    add_log(puppet_file.name, LOG_TYPE_DEBUG, (line_number, 0), "Unimplemented?", text)
+                    add_log(puppet_file.name, LOG_TYPE_DEBUG, (line_number, 0), "Unimplemented? while walking block", text)
                     index += size
                 index += 1
     return puppet_block
@@ -191,7 +212,7 @@ def walk_resource(content, typ, line_number, puppet_file):
         elif char == '}':
             index += 1
         elif char != ' ':
-            text, size = get_until(content[index:], "\n")
+            text, size = get_until(content[index:], ";", or_char='\n')
             text2, _ = get_until(content[index + size + 1:] + "\n", "\n")
             if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_POINTER):
                 if check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_VALUE):
@@ -202,7 +223,7 @@ def walk_resource(content, typ, line_number, puppet_file):
                     else:
                         check_regex(text, (line_number, 0), puppet_file, CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN)
                         puppet_resource.add_item(text)
-            index += size
+            index += size if size > 0 else 1
         else:
             index += 1
     return puppet_resource

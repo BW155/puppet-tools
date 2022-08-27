@@ -84,6 +84,11 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
     start = time.time()
 
     validate_puppet_module(total, path)
+
+    global VALIDATION_ERROR
+    if logs_contains_error():
+        VALIDATION_ERROR = True
+
     print_logs(log_level)
 
     print("validating took %f seconds" % (time.time() - start))

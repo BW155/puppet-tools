@@ -116,7 +116,7 @@ def entry():
                            "--log-level",
                            type=int,
                            default=LOG_TYPE_WARNING,
-                           help="Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5)")
+                           help="Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5) (default: Warning)")
 
     my_parser.add_argument("Path",
                            metavar="path",

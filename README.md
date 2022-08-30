@@ -27,7 +27,7 @@ Call: `python3 setup.py install`
 
 `puppet-tools <module_directory>`  
 
-The module should be according to the puppet standard and at least contain:
+The module should be according to [the puppet module structure](https://puppet.com/docs/puppet/7/modules_fundamentals.html#module_structure) and at least contain:
 ```text
 module_directory
 ├───files

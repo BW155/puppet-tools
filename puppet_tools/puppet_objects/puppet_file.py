@@ -1,5 +1,5 @@
-from constants import SPLIT_TOKEN
-from puppet_objects import PuppetObject
+from puppet_tools.constants import SPLIT_TOKEN
+from . import PuppetObject
 
 
 class PuppetFile(PuppetObject):

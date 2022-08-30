@@ -97,7 +97,7 @@ def main(path, log_level=LOG_TYPE_WARNING, print_tree=False, only_parse=True):
     print(colored("Validation:\tERROR", "red") if VALIDATION_ERROR else colored("Validation:\tSuccess", "green"))
 
 
-if __name__ == '__main__':
+def entry():
     my_parser = argparse.ArgumentParser(
         description="Puppet Tools, including parser, linter and validator functions"
     )
@@ -137,3 +137,7 @@ if __name__ == '__main__':
         exit(1)
 
     main(check_path, log_level=args.log_level, print_tree=args.print_tree, only_parse=args.only_parse)
+
+
+if __name__ == '__main__':
+    entry()

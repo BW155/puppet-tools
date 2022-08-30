@@ -1,4 +1,4 @@
-from puppet_objects import PuppetObject
+from . import PuppetObject
 
 
 class PuppetInclude(PuppetObject):

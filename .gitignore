@@ -2,3 +2,5 @@
 ._*
 *-development
 __pycache__
+dist
+build

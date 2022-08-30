@@ -1,9 +1,8 @@
-from puppet_objects import PuppetObject
+from . import PuppetObject
 
 
-class PuppetCaseItem(PuppetObject):
-    def __init__(self, name):
-        self.name = name
+class PuppetBlock(PuppetObject):
+    def __init__(self):
         self.items = []
 
     def add_item(self, item):
@@ -15,4 +14,4 @@ class PuppetCaseItem(PuppetObject):
             i.print_items(depth + 1)
 
     def __repr__(self):
-        return '<PuppetCaseItem: %s>' % self.name
+        return '<PuppetBlock>'

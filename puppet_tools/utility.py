@@ -1,7 +1,7 @@
 import os
 import re
 
-from constants import LOG_MESSAGES, CheckRegex, check_regex_list, LOG_TYPE_ERROR
+from .constants import LOG_MESSAGES, CheckRegex, check_regex_list, LOG_TYPE_ERROR
 
 log_list = []
 

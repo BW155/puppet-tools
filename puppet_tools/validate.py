@@ -1,15 +1,13 @@
 import os
-
+from .puppet_objects import PuppetObject
+from .puppet_objects.puppet_case_item import PuppetCaseItem
+from .puppet_objects.puppet_class import PuppetClass
+from .puppet_objects.puppet_include import PuppetInclude
+from .puppet_objects.puppet_resource import PuppetResource
+from .puppet_objects.puppet_variable import PuppetVariable
 from termcolor import colored
-
-from constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_WARNING, LOG_TYPE_DEBUG
-from puppet_objects import PuppetObject
-from puppet_objects.puppet_case_item import PuppetCaseItem
-from puppet_objects.puppet_class import PuppetClass
-from puppet_objects.puppet_include import PuppetInclude
-from puppet_objects.puppet_resource import PuppetResource
-from puppet_objects.puppet_variable import PuppetVariable
-from utility import add_log
+from .constants import LOG_TYPE_ERROR, SPLIT_TOKEN, LOG_TYPE_WARNING, LOG_TYPE_DEBUG
+from .utility import add_log
 
 
 def sort_puppet_objects(puppet_object, results=None, index_list=None):

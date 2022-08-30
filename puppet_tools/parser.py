@@ -1,14 +1,14 @@
 import string
 
-from constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_ERROR, LOG_TYPE_DEBUG, LOG_MESSAGES
-from puppet_objects.puppet_block import PuppetBlock
-from puppet_objects.puppet_case import PuppetCase
-from puppet_objects.puppet_case_item import PuppetCaseItem
-from puppet_objects.puppet_class import PuppetClass
-from puppet_objects.puppet_include import PuppetInclude
-from puppet_objects.puppet_resource import PuppetResource
-from puppet_objects.puppet_variable import PuppetVariable
-from utility import strip_comments, brace_count_verify, add_log, get_until, get_matching_end_brace, count_newlines, \
+from .constants import LOG_TYPE_FATAL, CheckRegex, check_regex_list, LOG_TYPE_ERROR, LOG_TYPE_DEBUG, LOG_MESSAGES
+from .puppet_objects.puppet_block import PuppetBlock
+from .puppet_objects.puppet_case import PuppetCase
+from .puppet_objects.puppet_case_item import PuppetCaseItem
+from .puppet_objects.puppet_class import PuppetClass
+from .puppet_objects.puppet_include import PuppetInclude
+from .puppet_objects.puppet_resource import PuppetResource
+from .puppet_objects.puppet_variable import PuppetVariable
+from .utility import strip_comments, brace_count_verify, add_log, get_until, get_matching_end_brace, count_newlines, \
     check_regex
 
 

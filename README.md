@@ -14,5 +14,9 @@ In addition this program also validates certain aspects of the configuration fil
    - used sources are available in the files folder of the module.
 
 ## Installation Instructions
+### Pip
+`pip install Puppet-Tools`
+
+### Alternative
 Clone the repository and call: `python3 -m pip install ./puppet-tools`  
 Alternative: `python3 setup.py install`

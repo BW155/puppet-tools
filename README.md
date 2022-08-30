@@ -40,5 +40,5 @@ module_directory
   -t, --print-tree      Print the tree of parsed objects
   -p, --only-parse      Only parse for format validating/linting
   -l LOG_LEVEL, --log-level LOG_LEVEL
-                        Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5)
+                        Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5) (default: Warning)
 ```

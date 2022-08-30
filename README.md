@@ -19,4 +19,26 @@ In addition this program also validates certain aspects of the configuration fil
 
 ### Alternative
 Clone the repository and call: `python3 -m pip install ./puppet-tools`  
-Alternative: `python3 setup.py install`
+or  
+Call: `python3 setup.py install`
+
+
+## Usage
+
+`puppet-tools <module_directory>`  
+
+The module should be according to the puppet standard and at least contain:
+```text
+module_directory
+├───files
+└───manifests
+```
+
+### Options
+```text
+  -h, --help            show this help message and exit
+  -t, --print-tree      Print the tree of parsed objects
+  -p, --only-parse      Only parse for format validating/linting
+  -l LOG_LEVEL, --log-level LOG_LEVEL
+                        Set minimum log level (Info=2, Warning=3, Error=4, Fatal=5)
+```

@@ -4,11 +4,11 @@ import argparse
 
 from termcolor import colored
 
-from constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO, LOG_TYPE_DEBUG
-from parser import walk_content
-from puppet_objects.puppet_file import PuppetFile
-from utility import get_file_contents, get_all_files, add_log, clear_logs, get_logs, logs_contains_error
-from validate import validate_puppet_module
+from .constants import SPLIT_TOKEN, LOG_TYPE_FATAL, LOG_TYPE_ERROR, LOG_TYPE_WARNING, LOG_TYPE_INFO, LOG_TYPE_DEBUG
+from .parser import walk_content
+from .puppet_objects.puppet_file import PuppetFile
+from .utility import get_file_contents, get_all_files, add_log, clear_logs, get_logs, logs_contains_error
+from .validate import validate_puppet_module
 
 
 PARSER_ERROR = False

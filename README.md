@@ -1,4 +1,6 @@
 # puppet-tools
+[![Downloads](https://pepy.tech/badge/puppet-tools)](https://pepy.tech/project/puppet-tools)
+[![Downloads](https://pepy.tech/badge/puppet-tools/week)](https://pepy.tech/project/puppet-tools)
 #### WARNING: This project is not complete and should be used carefully. Always check your own configuration.
 
 ## About this project

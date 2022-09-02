@@ -84,14 +84,13 @@ def validate_puppet_module(puppet_files, module_dir):
            "All includes have a corresponding class to include")
 
     # Verify all resource items
-    verify(verify_resource_items, {"resources": get_type(PuppetResource), "module_name": module_name},
+    verify(verify_resource_items, {"resources": get_type(PuppetResource)},
            "All resources have valid references")
 
     # Verify all resource item references
     verify(verify_resource_item_references, {
         "resources": get_type(PuppetResource),
         "services": services,
-        "module_name": module_name,
         "execs": execs,
         "packages": packages,
         "files": files
@@ -122,7 +121,7 @@ def verify_includes(includes, classes, module_name):
     return errors
 
 
-def verify_resource_items(resources, module_name):
+def verify_resource_items(resources):
     errors = False
     for r in resources:
         for val in r.items:
@@ -131,38 +130,38 @@ def verify_resource_items(resources, module_name):
 
             if r.typ == "file":
                 if name not in PuppetResource.ALLOWED_RESOURCE_FILE_ITEMS:
-                    add_log(module_name, LOG_TYPE_ERROR, (r.line_number, 0),
+                    add_log(r.file_name, LOG_TYPE_ERROR, (r.line_number, 0),
                             "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
                             str(r))
                     errors = True
             elif r.typ == "service":
                 if name not in PuppetResource.ALLOWED_RESOURCE_SERVICE_ITEMS:
-                    add_log(module_name, LOG_TYPE_ERROR, (r.line_number, 0),
+                    add_log(r.file_name, LOG_TYPE_ERROR, (r.line_number, 0),
                             "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
                             str(r))
                     errors = True
             elif r.typ == "package":
                 if name not in PuppetResource.ALLOWED_RESOURCE_PACKAGE_ITEMS:
-                    add_log(module_name, LOG_TYPE_ERROR, (r.line_number, 0),
+                    add_log(r.file_name, LOG_TYPE_ERROR, (r.line_number, 0),
                             "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
                             str(r))
                     errors = True
             elif r.typ == "exec":
                 if name not in PuppetResource.ALLOWED_RESOURCE_EXEC_ITEMS:
-                    add_log(module_name, LOG_TYPE_ERROR, (r.line_number, 0),
+                    add_log(r.file_name, LOG_TYPE_ERROR, (r.line_number, 0),
                             "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
                             str(r))
                     errors = True
             elif r.typ == "cron":
                 if name not in PuppetResource.ALLOWED_RESOURCE_CRON_ITEMS:
-                    add_log(module_name, LOG_TYPE_ERROR, (r.line_number, 0),
+                    add_log(r.file_name, LOG_TYPE_ERROR, (r.line_number, 0),
                             "Resource '%s' item name %s not in allowed names for this resource type" % (r.typ, name),
                             str(r))
                     errors = True
             elif r.typ == "firewall":
                 pass  # TODO: Implement
             else:
-                add_log(module_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented verify resource type: '%s'" % r.typ, str(r))
+                add_log(r.file_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented verify resource type: '%s'" % r.typ, str(r))
     return errors
 
 
@@ -176,7 +175,7 @@ def find_any_path(resources, search_path):
     return False
 
 
-def verify_resource_item_references(resources, services, files, execs, packages, module_name):
+def verify_resource_item_references(resources, services, files, execs, packages):
     errors = False
 
     service_names = [s.name for s in services]
@@ -193,7 +192,7 @@ def verify_resource_item_references(resources, services, files, execs, packages,
                 service_name = value.replace("Service['", "").replace("']", "")
                 if service_name not in service_names:
                     add_log(
-                        module_name, LOG_TYPE_WARNING, (r.line_number, 0),
+                        r.file_name, LOG_TYPE_WARNING, (r.line_number, 0),
                         "Resource %s '%s' has a reference to Service '%s' but couldn't be found, may exist in parent "
                         "module" % (r.typ, r.name, service_name), str(r))
             elif value.startswith("File"):
@@ -201,28 +200,28 @@ def verify_resource_item_references(resources, services, files, execs, packages,
 
                 if file_name not in file_names and not find_any_path(files, file_name):
                     add_log(
-                        module_name, LOG_TYPE_WARNING, (r.line_number, 0),
+                        r.file_name, LOG_TYPE_WARNING, (r.line_number, 0),
                         "Resource %s '%s' has a reference to File '%s' but couldn't be found, may exist in parent "
                         "module" % (r.typ, r.name, file_name), str(r))
             elif value.startswith("Exec"):
                 exec_name = value.replace("Exec['", "").replace("']", "")
                 if exec_name not in exec_names:
                     add_log(
-                        module_name, LOG_TYPE_WARNING, (r.line_number, 0),
+                        r.file_name, LOG_TYPE_WARNING, (r.line_number, 0),
                         "Resource %s '%s' has a reference to Exec '%s' but couldn't be found, may exist in parent "
                         "module" % (r.typ, r.name, exec_name), str(r))
             elif value.startswith("Package"):
                 package_name = value.replace("Package['", "").replace("']", "")
                 if package_name not in package_names:
                     add_log(
-                        module_name, LOG_TYPE_WARNING, (r.line_number, 0),
+                        r.file_name, LOG_TYPE_WARNING, (r.line_number, 0),
                         "Resource %s '%s' has a reference to Package '%s' but couldn't be found, may exist in parent "
                         "module" % (r.typ, r.name, package_name), str(r))
             elif value.startswith("Stage"):
-                add_log(module_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented Stage['.*']", str(r))
+                add_log(r.file_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented Stage['.*']", str(r))
                 pass  # TODO: Implement? what is it?
             elif value.startswith("template"):
-                add_log(module_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented template['.*']", str(r))
+                add_log(r.file_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Not Implemented template['.*']", str(r))
                 pass  # TODO: Implement template validation
             elif value.startswith("'"):
                 pass
@@ -239,7 +238,7 @@ def verify_resource_item_references(resources, services, files, execs, packages,
             elif value.startswith("[") and value.endswith("]"):
                 pass
             else:
-                add_log(module_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Unimplemented resource item?", value)
+                add_log(r.file_name, LOG_TYPE_DEBUG, (r.line_number, 0), "Unimplemented resource item?", value)
 
     return errors
 

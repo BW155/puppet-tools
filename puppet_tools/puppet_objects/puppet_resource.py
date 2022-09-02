@@ -38,8 +38,8 @@ class PuppetResource(PuppetObject):
         for i in self.items:
             print("\t" * depth, i)
 
-    def set_dependency(self):
+    def set_is_dependency(self):
         self.is_dependency = True
 
     def __repr__(self):
-        return '<PuppetResource \'%s\': \'%s\', dependency: %d>' % (self.typ, self.name, self.is_dependency)
+        return '<PuppetResource \'%s\': \'%s\', dependency: %d, file: %s>' % (self.typ, self.name, self.is_dependency, self.file_name)

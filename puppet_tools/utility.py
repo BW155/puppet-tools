@@ -6,6 +6,47 @@ from .constants import LOG_MESSAGES, CheckRegex, check_regex_list, LOG_TYPE_ERRO
 log_list = []
 
 
+class ParseHelper:
+    def __init__(self, content, index):
+        self.content = content
+        self.ind = index
+        self.results_list = []
+        self.index_save = {}
+
+    def p1(self):
+        self.ind += 1
+        return self
+
+    def ps(self, size):
+        self.ind += size
+        return self
+
+    def until(self, chars, save=False):
+        if type(chars) == str:
+            chars = [chars]
+        res, size = get_until(self.content[self.ind:], chars)
+        self.ind += size
+        if save:
+            self.results_list.append(res)
+        return self
+
+    def get_content_till_end_brace(self, override_index=None):
+        ind = get_matching_end_brace(self.content, self.index_save[override_index] if override_index else self.ind)
+        c = self.content[self.ind:ind]
+        self.ind += ind - self.ind
+        return c, count_newlines(c)
+
+    def save_index(self, name: str):
+        self.index_save[name] = self.ind
+        return self
+
+    def results(self):
+        return self.results_list
+
+    def index(self):
+        return self.ind
+
+
 def strip_comments(code):
     code = str(code)
     return re.sub(r'(?m)^ *#.*\n?', '\n', code)
@@ -56,8 +97,7 @@ def get_file_contents(path):
         return f.read()
 
 
-def find_next_char(content, char, or_char=None):
-    chars = [char, or_char]
+def find_next_char(content, chars):
     index = 0
 
     while content[index] not in chars:
@@ -73,10 +113,12 @@ def find_next_string(content, string):
     return index
 
 
-def get_until(content, char=None, string=None, or_char=None):
+def get_until(content, chars=None, string=None, or_char=None):
     size = 0
-    if char:
-        size = find_next_char(content, char, or_char)
+    if type(chars) == str:
+        chars = [chars, or_char]
+    if chars:
+        size = find_next_char(content, chars)
     elif string:
         size = find_next_string(content, string)
 

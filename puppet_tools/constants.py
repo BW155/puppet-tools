@@ -33,7 +33,7 @@ check_regex_list = {
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA: re.compile(r"\S+[ ]*=>[ ]*.*,"),
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA_WARN: re.compile(r"\S+[ ]*=>[ ]*.*,"),
     CheckRegex.CHECK_RESOURCE_ITEM_COMMA_NEXT_LINE_END: re.compile(r"\S+ *=>.* *}"),
-    CheckRegex.CHECK_INCLUDE_LINE: re.compile(r"include \S+ *} *$"),
+    CheckRegex.CHECK_INCLUDE_LINE: re.compile(r"include [a-z0-9:_]* *"),
     CheckRegex.CHECK_CASE_LINE: re.compile(r"case \S+ *{"),
     CheckRegex.CHECK_CLASS_LINE: re.compile(r"class \S+ *{"),
     CheckRegex.CHECK_CLASS_LINE2: re.compile(r"class *{ *[\"']\S+[\"'] *:"),
